@@ -56,6 +56,12 @@ class DrugController extends Controller
         });
 
 
+        if(isset($json->error->code) == 'NOT_FOUND'){
+            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
+            ->withInput();
+        }
+
+
         $data = $json->results;
         
         
