@@ -18,8 +18,6 @@ class DrugController extends Controller
         'drugsFDA' => 'drugsfda.json?'
         ];
 
-
-    static $api_key =  "api_key=ApASi6a1Uzs5ageWsCTL6uaiSux0PCgFYs6k0VnS";
     
 
     //index page
@@ -35,11 +33,17 @@ class DrugController extends Controller
     }
 
 
+    //gets api key from config file
+    public function getOpenFdaApiKey(){
+        return config('values.openFdaApiKey');
+    }
+
+
     //get drug results
     public function getDrugs(Request $request) {
         //build api query here
 
-        $query = self::$api_url . self::$endPoint['drugsFDA'] . self::$api_key . '&search=openfda.brand_name:' . $request->drugName . '+openfda.generic_name:' . $request->drugName . '&limit=' . $request->count;
+        $query = self::$api_url . self::$endPoint['drugsFDA'] . "api_key=" . self::getOpenFdaApiKey() . '&search=openfda.brand_name:' . $request->drugName . '+openfda.generic_name:' . $request->drugName . '&limit=' . $request->count;
 
         
         //Create unique cache key by turning query url into md5 hash
@@ -51,7 +55,7 @@ class DrugController extends Controller
             return json_decode(Http::get($query)->getBody());
         });
 
-        
+
         $data = $json->results;
         
         
