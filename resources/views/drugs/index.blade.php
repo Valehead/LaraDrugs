@@ -18,7 +18,9 @@
 
                         <div class="mb-3">
                             <label for="drugName" class="form-label">Drug Name</label>
-                            <input type="text" id="drugName" name="drugName" class="form-control" autofocus>
+                            <input type="text" id="drugName" name="drugName" class="form-control"
+                                placeholder="Search by Generic or Brand name..."
+                                value="{{ old('drugName') }}" autofocus>
                         </div>
                         
                         <div class="mb-3">
