@@ -1,3 +1,5 @@
+@props(['drugs'])
+
 <x-layout>
 
     <div class="container">
@@ -9,7 +11,7 @@
             <div class="col-12">
 
 
-                    <x-drug-search-table />
+                    <x-drug-search-table :drugs="$drugs"/>
 
 
             </div>

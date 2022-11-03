@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class DrugController extends Controller
 {
@@ -41,17 +42,20 @@ class DrugController extends Controller
         $query = self::$api_url . self::$endPoint['drugsFDA'] . self::$api_key . '&search=openfda.brand_name:' . $request->drugName . '+openfda.generic_name:' . $request->drugName . '&limit=' . $request->count;
 
         
-        $response = Http::get($query);
+        //Create unique cache key by turning query url into md5 hash
+        $cacheKey = 'drugs.'.md5($query);
+
+        $json = Cache::remember($cacheKey, 3600, function () use ($query) {
+
+            //Return object
+            return json_decode(Http::get($query)->getBody());
+        });
 
         
-        $data = json_decode($response->getBody());
+        $data = $json->results;
         
         
-        
-        // dd($data->results);
-
-        return view('drugs.search-results',$data->results);
-
+        return view('drugs.search-results',['drugs' => $data]);
     }
 
 

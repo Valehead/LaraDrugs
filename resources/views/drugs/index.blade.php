@@ -32,7 +32,7 @@
 
                         <div class="mb-3">
                             <label for="limitCount" class="form-label">Count Limit</label>
-                            <input type="number" id="limitCount" value="1" name="count" class="form-control">
+                            <input type="number" id="limitCount" value="20" name="count" class="form-control">
                         </div>
 
                         <div class="d-flex justify-content-end">

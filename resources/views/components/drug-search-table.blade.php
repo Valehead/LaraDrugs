@@ -12,9 +12,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($collection as $item)
+                @foreach ($drugs as $drug)
                 
-                    <x-search-result-table-components.drug-row />
+                    <x-search-result-table-components.drug-row :drug="$drug" :iteration="$loop->iteration"/>
                     
                 @endforeach
             </tbody>

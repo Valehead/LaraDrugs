@@ -20,7 +20,7 @@
         <nav class="container-fluid">
             <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 mx-4 border-bottom">
               <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
-                <img class="w-25" src="{{asset('images/logo.png')}}" alt="" class="logo"/>
+                <img class="w-50" src="{{asset('https://nextvisit.app/assets/brand/nv-logo.png')}}" alt="" class="logo"/>
               </a>
         
               <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
