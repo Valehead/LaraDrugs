@@ -110,7 +110,7 @@ class DrugController extends Controller
         $data = self::getDrugs($query);
 
 
-        return $data->results;
+        return $data;
     }
 
 
@@ -120,7 +120,11 @@ class DrugController extends Controller
 
         $data = self::getDrugByNDC($request);
 
-        return view('drugs.show',['drug' => $data]);
+        if(isset($data->error->code) == 'NOT_FOUND'){
+            return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
+        }
+
+        return view('drugs.show',['drug' => $data->results[0]]);
 
     }
 
