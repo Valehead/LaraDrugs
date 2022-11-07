@@ -56,6 +56,9 @@ class DrugController extends Controller
 
     //execute the given query and store results to cache
     public function getDrugs($query){
+
+        // dd($query);
+
         //Create unique cache key by turning query url into md5 hash
         $cacheKey = 'drugs.'.md5($query);
 
@@ -65,14 +68,7 @@ class DrugController extends Controller
             return json_decode(Http::get($query)->getBody());
         });
 
-
-        if(isset($json->error->code) == 'NOT_FOUND'){
-            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
-            ->withInput();
-        }
-
-
-        return $json->results;
+        return $json;
 
     }
 
@@ -90,6 +86,19 @@ class DrugController extends Controller
     }
 
 
+    public function showDrugsSearch(Request $request){
+
+        $data = self::getDrugsByName($request);
+
+        if(isset($data->error->code) == 'NOT_FOUND'){
+            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
+            ->withInput();
+        }
+
+        return view('drugs.search-results',['drugs' => $data->results]);
+    }
+
+
 
     //get drug results by name
     public function getDrugByNDC(Request $request) {
@@ -101,18 +110,8 @@ class DrugController extends Controller
         $data = self::getDrugs($query);
 
 
-        return $data;
+        return $data->results;
     }
-
-
-
-    public function showDrugsSearch(Request $request){
-
-        $data = self::getDrugsByName($request);
-
-        return view('drugs.search-results',['drugs' => $data]);
-    }
-
 
 
 
