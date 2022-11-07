@@ -1,8 +1,6 @@
 
 <x-layout>
 
-    <div class="container">
-
         <div class="row">
 
             <div class="col-4 offset-4">
@@ -22,7 +20,7 @@
                                 placeholder="Search by Generic or Brand name..."
                                 value="{{ old('drugName') }}" autofocus>
                         </div>
-                        
+
                         <div class="mb-3">
                             <x-form-components.drug-class-select />
                         </div>
@@ -44,9 +42,6 @@
                     </form>
                 </x-card>
             </div>
-
         </div>
-
-    </div>
 
 </x-layout>
