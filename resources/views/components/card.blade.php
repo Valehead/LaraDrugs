@@ -1,5 +1,3 @@
-<div class="card ">
-    <div class="card-body">
-        {{$slot}}
-    </div>
+<div class="card">
+    {{$slot}}
 </div>

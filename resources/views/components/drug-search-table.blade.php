@@ -1,5 +1,5 @@
 <x-card>
-
+    <div class="card-body">
         <table class="table">
             <thead>
                 <tr>
@@ -13,11 +13,11 @@
             </thead>
             <tbody>
                 @foreach ($drugs as $drug)
-                
+
                     <x-search-result-table-components.drug-row :drug="$drug" :iteration="$loop->iteration"/>
-                    
+
                 @endforeach
             </tbody>
         </table>
-
+    </div>
 </x-card>
