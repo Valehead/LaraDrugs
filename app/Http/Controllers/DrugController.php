@@ -98,7 +98,7 @@ class DrugController extends Controller
             ->withInput();
         }
 
-        return view('drugs.search-results',['drugs' => $data->results->products]);
+        return view('drugs.search-results',['drugs' => $data->results]);
     }
 
 

@@ -11,7 +11,7 @@
             <div class="col-12">
 
 
-                    <x-drug-search-table :drugs="$drugs"/>
+                    <x-drug-search-table :applications="$drugs"/>
 
 
             </div>
