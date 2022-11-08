@@ -40,6 +40,9 @@ class DrugController extends Controller
 
         switch($searchMethod){
             case 'byName':
+                $query .= 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
+                break;
+            case 'byNameORIGINAL':
                 $query .= 'openfda.brand_name:' . $request->drugName . '+openfda.generic_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
                 break;
             case 'byNDC':
@@ -95,7 +98,7 @@ class DrugController extends Controller
             ->withInput();
         }
 
-        return view('drugs.search-results',['drugs' => $data->results]);
+        return view('drugs.search-results',['drugs' => $data->results->products]);
     }
 
 
