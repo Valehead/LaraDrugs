@@ -36,14 +36,12 @@ class DrugController extends Controller
     //query builder
     public function stitchDrugQuery(Request $request, String $searchMethod){
 
-        $query = self::$api_url . self::$endPoint['drugsFDA'] . "api_key=" . self::getOpenFdaApiKey() . '&search=';
+        //markteing_status attempts to exclude
+        $query = self::$api_url . self::$endPoint['drugsFDA'] . "api_key=" . self::getOpenFdaApiKey() . '&search=products.marketing_status:(Prescription+OR+Over-the-counter)+AND+';
 
         switch($searchMethod){
             case 'byName':
                 $query .= 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
-                break;
-            case 'byNameORIGINAL':
-                $query .= 'openfda.brand_name:' . $request->drugName . '+openfda.generic_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
                 break;
             case 'byNDC':
                 $query .= 'openfda.product_ndc:"' . $request->product_ndc . '"&limit=1' . '&sort=application_number:asc';
