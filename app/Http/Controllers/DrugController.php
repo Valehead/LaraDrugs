@@ -43,10 +43,10 @@ class DrugController extends Controller
             case 'byName':
                 $query .= 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
                 break;
-            case 'byNDC':
-                $query .= 'openfda.product_ndc:"' . $request->product_ndc . '"&limit=1' . '&sort=application_number:asc';
+            case 'byApplicationNumProductNum':
+                $query .= 'application_number:"' . $request->application_num . '"+AND+products.product_number:' . $request->product_num . '&limit=1' . '&sort=application_number:asc';
                 break;
-        };
+            };
 
         // dd($query);
         return $query;
@@ -87,6 +87,37 @@ class DrugController extends Controller
     }
 
 
+
+
+    //get drug results by name
+    public function getDrugbyApplicationNumProductNum(Request $request) {
+        //build api query here
+
+        $query = self::stitchDrugQuery($request, 'byApplicationNumProductNum');
+        // dd($query);
+
+        $data = self::getDrugs($query);
+
+        // dd($data);
+        return $data;
+    }
+
+
+
+    //show drug results
+    public function showDrug(Request $request) {
+
+        $data = self::getDrugbyApplicationNumProductNum($request);
+
+        if(isset($data->error->code) == 'NOT_FOUND'){
+            return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
+        }
+
+        return view('drugs.show',['drug' => $data->results[0]]);
+
+    }
+
+
     public function showDrugsSearch(Request $request){
 
         $data = self::getDrugsByName($request);
@@ -98,35 +129,4 @@ class DrugController extends Controller
 
         return view('drugs.search-results',['drugs' => $data->results]);
     }
-
-
-
-    //get drug results by name
-    public function getDrugByNDC(Request $request) {
-        //build api query here
-
-        $query = self::stitchDrugQuery($request, 'byNDC');
-
-
-        $data = self::getDrugs($query);
-
-
-        return $data;
-    }
-
-
-
-    //show drug results
-    public function showDrug(Request $request) {
-
-        $data = self::getDrugByNDC($request);
-
-        if(isset($data->error->code) == 'NOT_FOUND'){
-            return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
-        }
-
-        return view('drugs.show',['drug' => $data->results[0]]);
-
-    }
-
 }

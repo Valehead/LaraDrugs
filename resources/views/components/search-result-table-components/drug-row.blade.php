@@ -7,5 +7,5 @@
     {{-- <td>{{$drug->openfda->generic_name[0]}}</td> --}}
     <td>{{$drug->dosage_form}}</td>
     <td>{{$drug->route}}</td>
-    <td><a href="/drugs/{{ $appnum }}/{{ $drug->brand_name }}">Link</a></td>
+    <td><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">Link</a></td>
 </tr>
