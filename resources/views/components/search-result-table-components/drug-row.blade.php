@@ -1,11 +1,11 @@
-@props(['drug', 'iteration'])
+@props(['drug', 'iteration', 'appnum'])
 {{-- {{dd($drug)}} --}}
 <tr>
-    <th scope="row">{{$iteration}}</th>
-    <td>{{$drug->openfda->brand_name[0]}}</td>
-    <td>{{$drug->openfda->generic_name[0]}}</td>
-    <td>{{$drug->products[0]->dosage_form}}</td>
-    <td>{{$drug->products[0]->route}}</td>
-    {{-- <td><a href="/drugs/{{ strtolower($drug->sponsor_name) }}/{{ $drug->openfda->brand_name[0] }}/{{ $drug->openfda->product_ndc[0] }}">Link</a></td> --}}
-    <td><a href="/drugs/{{ $drug->openfda->product_ndc[0] }}">Link</a></td>
+    <th scope="row"><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">{{$iteration}}</a></th>
+    <td>{{$drug->brand_name}}</td>
+    <td>Generic Name</td>
+    {{-- <td>{{$drug->openfda->generic_name[0]}}</td> --}}
+    <td>{{$drug->dosage_form}}</td>
+    <td>{{$drug->route}}</td>
+    <td><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">Link</a></td>
 </tr>

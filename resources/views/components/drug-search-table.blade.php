@@ -12,9 +12,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($drugs as $drug)
+                @php
+                    $numOfDrugs = 1;
+                @endphp
+                @foreach ($applications as $application)
+                    @php
+                        $appnum=$application->application_number;
+                    @endphp
 
-                    <x-search-result-table-components.drug-row :drug="$drug" :iteration="$loop->iteration"/>
+                    @foreach ($application->products as $drug)
+
+                        <x-search-result-table-components.drug-row :drug="$drug" :iteration="$numOfDrugs" :appnum="$appnum"/>
+                        @php
+                            $numOfDrugs++;
+                        @endphp
+                    @endforeach
 
                 @endforeach
             </tbody>

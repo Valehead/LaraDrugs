@@ -16,9 +16,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="drugName" class="form-label">Drug Name</label>
+                                <label for="drugName" class="form-label">Medication Name</label>
                                 <input type="text" id="drugName" name="drugName" class="form-control"
-                                    placeholder="Search by Generic or Brand name..."
+                                    placeholder="Search by Brand name..."
                                     value="{{ old('drugName') }}" autofocus>
                             </div>
 
@@ -32,7 +32,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="limitCount" class="form-label">Count Limit</label>
+                                <label for="limitCount" class="form-label">Results Limit</label>
                                 <input type="number" id="limitCount" value="20" name="count" class="form-control">
                             </div>
 

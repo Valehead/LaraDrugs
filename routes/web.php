@@ -20,7 +20,7 @@ Route::get('/', [DrugController::class, 'index']);
 
 //routes to show drug, less descriptive uri with only ndc
 // Route::get('/drugs/{sponsor_name}/{brand_name}/{product_ndc}', [DrugController::class, 'showDrug']);
-Route::get('/drugs/{product_ndc}', [DrugController::class, 'showDrug']);
+Route::get('/drugs/{application_num}/{product_num}', [DrugController::class, 'showDrug']);
 
 
 Route::post('/drugs', [DrugController::class, 'showDrugsSearch']);
