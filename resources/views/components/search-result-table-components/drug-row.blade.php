@@ -1,11 +1,25 @@
-@props(['drug', 'iteration', 'appnum'])
+@props(['drug', 'iteration', 'appnum', 'appAccordionBool'])
 {{-- {{dd($drug)}} --}}
+
+@if ($appAccordionBool == true)
+
+<tr>
+    <th scope="row">{{ $iteration }}</th>
+    <td>{{ $drug->brand_name }}</td>
+    <td>{{ $drug->dosage_form }}</td>
+    <td>{{ $drug->route }}</td>
+    <td><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">Link</a></td>
+</tr>
+
+@else
+
 <tr>
     <th scope="row"><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">{{$iteration}}</a></th>
     <td>{{$drug->brand_name}}</td>
     <td>{{ $appnum }}</td>
-    {{-- <td>{{$drug->openfda->generic_name[0]}}</td> --}}
     <td>{{$drug->dosage_form}}</td>
     <td>{{$drug->route}}</td>
     <td><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">Link</a></td>
 </tr>
+
+@endif
