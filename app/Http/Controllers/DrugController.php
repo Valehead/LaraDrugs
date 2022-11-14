@@ -119,7 +119,6 @@ class DrugController extends Controller
             if($product->product_number === $request->product_num){
                 unset($data->results[0]->products);
                 $data->results[0]->products[] = $product;
-                // $iteration = $key;
                 break;
             }
         }
