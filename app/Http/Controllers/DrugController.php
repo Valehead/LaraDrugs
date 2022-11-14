@@ -113,6 +113,16 @@ class DrugController extends Controller
             return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
         }
 
+        $iteration = 0;
+
+        foreach($data->results[0]->products as $key=>$product){
+            if($product->product_number === $request->product_num){
+                unset($data->results[0]->products);
+                $data->results[0]->products[] = $product;
+                break;
+            }
+        }
+
         return view('drugs.show',['drug' => $data->results[0]]);
 
     }
