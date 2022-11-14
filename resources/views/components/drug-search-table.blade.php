@@ -15,12 +15,8 @@
             <tbody>
             @php
                 $numOfDrugs = 1;
+                $accordionID = 0;
             @endphp
-            @foreach ($applications as $application)
-                @php
-                    $numOfDrugs = 1;
-                    $accordionID = 0;
-                @endphp
 
                 @foreach ($applications as $application)
 
@@ -92,7 +88,6 @@
 
 
                 @endforeach
-            @endforeach
             </tbody>
         </table>
     </div>
