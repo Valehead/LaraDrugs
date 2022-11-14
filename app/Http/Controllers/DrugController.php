@@ -102,7 +102,7 @@ class DrugController extends Controller
 
 
     //get drug results by application number & product number
-    public function getDrugbyApplicationNumProductNum($request, $searchMethod, $endPointKey)
+    public function getIndividualDrugData($request, $searchMethod, $endPointKey)
     {
         //build api query here
 
@@ -121,7 +121,7 @@ class DrugController extends Controller
     public function showDrug(Request $request)
     {
 
-        $data = self::getDrugbyApplicationNumProductNum($request, 'byApplicationNumProductNum', 'drugsFDA');
+        $data = self::getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
         if (isset($data->error->code) == 'NOT_FOUND') {
             return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
         }
@@ -138,7 +138,7 @@ class DrugController extends Controller
 
         //dd($data->results[0]->products[0]->brand_name);
 
-        $labelingData = self::getDrugbyApplicationNumProductNum((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
+        $labelingData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
 
 
@@ -151,14 +151,13 @@ class DrugController extends Controller
     {
 
         $data = self::getDrugsByName($request);
-        $data2 = self::getDrugsByName($request);
 
         if (isset($data->error->code) == 'NOT_FOUND') {
             return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
                 ->withInput();
         }
 
-        return view('drugs.search-results', ['drugs' => $data->results,'druginfo'=>$data2->results]);
+        return view('drugs.search-results', ['drugs' => $data->results]);
     }
 }
 
