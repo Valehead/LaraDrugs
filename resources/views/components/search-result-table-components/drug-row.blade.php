@@ -4,7 +4,7 @@
 @if ($appAccordionBool == true)
 
 <tr>
-    <th scope="row">{{ $iteration }}</th>
+    <th scope="row"><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">{{ $iteration }}</a></th>
     <td>{{ $drug->brand_name }}</td>
     <td>
         @foreach ($drug->active_ingredients as $ingredient)

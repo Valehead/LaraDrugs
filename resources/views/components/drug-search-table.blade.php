@@ -27,7 +27,7 @@
                             $accordionID++;
                         @endphp
 
-                        <tr data-bs-toggle="collapse" href="#accordion{{ $accordionID }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <tr data-bs-toggle="collapse" href="#accordion{{ $accordionID }}" role="button" aria-expanded="false" x-data="{ colored: false }" x-on:click="colored = ! colored" x-bind:style="colored && 'background-color: #eeeee4'">
                             <th scope="row">~</th>
                             <td class="fw-bold">
                                 {{ isset($application->openfda) ? $application->openfda->brand_name[0] : $application->products[0]->brand_name }}
@@ -36,7 +36,6 @@
                             <td>Click to See More</td>
                             <td>V</td>
                             <td></td>
-                            {{-- <td>{{ isset($application->openfda) ? $application->openfda->brand_nam[0] : $application->products[0]->brand_name }}</td> --}}
                         </tr>
 
                         <tr style="border-bottom: hidden">
@@ -93,3 +92,4 @@
         </table>
     </div>
 </x-card>
+
