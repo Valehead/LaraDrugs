@@ -6,6 +6,13 @@
 <tr>
     <th scope="row">{{ $iteration }}</th>
     <td>{{ $drug->brand_name }}</td>
+    <td>
+        @foreach ($drug->active_ingredients as $ingredient)
+
+            {{ $ingredient->name . ': ' . $ingredient->strength }}
+
+        @endforeach
+    </td>
     <td>{{ $drug->dosage_form }}</td>
     <td>{{ $drug->route }}</td>
     <td><a href="/drugs/{{ $appnum }}/{{ $drug->product_number }}">Link</a></td>
