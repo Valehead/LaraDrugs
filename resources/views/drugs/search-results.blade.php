@@ -1,4 +1,4 @@
-@props(['drugs'])
+@props(['drugs', 'druginfo'])
 
 <x-layout>
 

@@ -22,7 +22,6 @@ Route::get('/', [DrugController::class, 'index']);
 // Route::get('/drugs/{sponsor_name}/{brand_name}/{product_ndc}', [DrugController::class, 'showDrug']);
 Route::get('/drugs/{application_num}/{product_num}', [DrugController::class, 'showDrug']);
 
-
 Route::post('/drugs', [DrugController::class, 'showDrugsSearch']);
 
 // Route::get('/drugs/search-results', [DrugController::class, 'showDrugSearchResults']);
