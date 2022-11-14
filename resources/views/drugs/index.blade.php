@@ -26,10 +26,6 @@
                                 <x-form-components.drug-class-select />
                             </div>
 
-                            <div class="mb-3">
-                                <label for="symptomName" class="form-label">Symptom</label>
-                                <input type="text" id="symptomName" name="symptom" class="form-control" autofocus disabled>
-                            </div>
 
                             <div class="mb-3">
                                 <label for="limitCount" class="form-label">Results Limit</label>
