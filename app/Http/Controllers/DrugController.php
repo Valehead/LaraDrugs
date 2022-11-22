@@ -149,6 +149,12 @@ class DrugController extends Controller
                 ->withInput();
         }
 
+        // if (count($data->results) === 1 && count($data->results[0]->products) === 1) {
+        //     return view('drugs.show', ['drug' => $data->results[0]])
+        // }
+
+        // dd($data->results);
+
         return view('drugs.search-results', ['drugs' => $data->results]);
     }
 }
