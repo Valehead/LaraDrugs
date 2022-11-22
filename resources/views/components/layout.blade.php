@@ -39,7 +39,7 @@
                   <input type="text" id="drugName" name="drugName" class="form-control"
                          placeholder="Search by Brand name...">
                   <div class="d-flex justify-content-end">
-                      <button class="btn btn-primary">Search!</button>
+                      <button class="btn btn-primary m-3">Search!</button>
                   </div>
                       </div>
                   </form>
