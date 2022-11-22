@@ -54,14 +54,7 @@
                 <div class="accordion-body">
                     <ul class="list-group list-group-flush">
 
-                            <li class="list-group-item overflow-auto" style="height:200px"><p>{{$druginfo->warnings[0]}}</p></li>
-
-                            <li class="list-group-item"><p>{{$druginfo->when_using[0]}}</p></li>
-                            <li class="list-group-item"><p>{{$druginfo->stop_use[0]}}</p></li>
-                            <li class="list-group-item"><p>{{$druginfo->do_not_use[0]}}</p></li>
-                            <li class="list-group-item"><p>{{$druginfo->pregnancy_or_breast_feeding[0]}}</p></li>
-                            <li class="list-group-item"><p>{{$druginfo->questions[0]}}</p></li>
-
+                        <x-drug-info-card-components.drug-info-accordion-warnings :druginfo="$druginfo" />
 
                     </ul>
                 </div>

@@ -20,45 +20,42 @@ class DrugController extends Controller
 
 
     //index page
-    public function index()
-    {
+    public function index() {
         return view('drugs.index');
     }
 
 
     //gets api key from config file
-    public function getOpenFdaApiKey()
-    {
+    static function getOpenFdaApiKey() {
         return config('values.openFdaApiKey');
     }
 
 
     //query builder
-    public function stitchDrugQuery($request, string $searchMethod, string $endPointKey)
-    {
+    public function stitchDrugQuery($dataToSearch, string $searchMethod, string $endPointKey) {
 
         //marketing_status attempts to exclude
-        $query = self::$api_url . self::$endPoint[$endPointKey] . "api_key=" . self::getOpenFdaApiKey();
+        $query = self::$api_url . self::$endPoint[$endPointKey] . "api_key=" . $this->getOpenFdaApiKey();
         $discludeDiscontinued =  '&search=products.marketing_status:(Prescription+OR+Over-the-counter)+AND+';
 
         switch ($searchMethod) {
             //search by drug name
             case 'byName':
-                $query .= $discludeDiscontinued . 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
+                $query .= $discludeDiscontinued . 'products.brand_name:' . $dataToSearch->drugName . '&limit=' . $dataToSearch->count . '&sort=application_number:asc';
                 break;
             //search by application num and product num
             case 'byApplicationNumProductNum':
-                $query .= $discludeDiscontinued . 'application_number:"' . $request->application_num . '"+AND+products.product_number:' . $request->product_num . '&limit=1' . '&sort=application_number:asc';
+                $query .= $discludeDiscontinued . 'application_number:"' . $dataToSearch->application_num . '"+AND+products.product_number:' . $dataToSearch->product_num . '&limit=1' . '&sort=application_number:asc';
                 break;
             //search by indications and usage
             case 'byProductLabeling':
-                $query .=  '&search=' . $request->drugName . '+AND+count=indications_and_usage' . '&limit=1';
+                $query .=  '&search=' . $dataToSearch->drugName . '+AND+count=indications_and_usage' . '&limit=1';
                 break;
             case 'byNDC';
-                $query .= '&search=' . $request->drugName . '&limit=1';
+                $query .= '&search=' . $dataToSearch->drugName . '&limit=1';
             //search by adverse events
             case 'byAdverseEvents':
-                $query .= '&search=' . $request->drugName . '+AND+count=patient.reaction.reactionmeddrapt.exact' . '&limit=10';
+                $query .= '&search=' . $dataToSearch->drugName . '+AND+count=patient.reaction.reactionmeddrapt.exact' . '&limit=10';
                 break;
         }
 
@@ -68,8 +65,7 @@ class DrugController extends Controller
 
 
     //execute the given query and store results to cache
-    public function getAndCacheDrugs($query)
-    {
+    public function getAndCacheDrugs($query) {
 
         //Create unique cache key by turning query url into md5 hash
         $cacheKey = 'drugs.' . md5($query);
@@ -85,27 +81,25 @@ class DrugController extends Controller
     }
 
     //get drug results by name
-    public function getDrugsByName(Request $request)
-    {
+    public function getDrugsByName(Request $request) {
         //build api query here
 
-        $query = self::stitchDrugQuery($request, 'byName', 'drugsFDA');
+        $query = $this->stitchDrugQuery($request, 'byName', 'drugsFDA');
 
 
-        $data = self::getAndCacheDrugs($query);
+        $data = $this->getAndCacheDrugs($query);
 
         return $data;
     }
 
 
     //get drug results by application number & product number
-    public function getIndividualDrugData($request, $searchMethod, $endPointKey)
-    {
+    public function getIndividualDrugData($request, $searchMethod, $endPointKey) {
         //build api query here
 
-        $query = self::stitchDrugQuery($request, $searchMethod, $endPointKey);
+        $query = $this->stitchDrugQuery($request, $searchMethod, $endPointKey);
 
-        $data = self::getAndCacheDrugs($query);
+        $data = $this->getAndCacheDrugs($query);
 
         return $data;
     }
@@ -113,10 +107,10 @@ class DrugController extends Controller
 
 
     //show drug results
-    public function showDrug(Request $request)
-    {
+    public function showDrug(Request $request) {
 
-        $data = self::getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
+        $data = $this->getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
+
         if (isset($data->error->code) == 'NOT_FOUND') {
             return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
         }
@@ -131,7 +125,7 @@ class DrugController extends Controller
             }
         }
 
-        $labelingData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
+        $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
 
         return view('drugs.show',['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
@@ -139,15 +133,11 @@ class DrugController extends Controller
     }
 
 
-    public function showDrugsSearch(Request $request)
-    {
+    public function showDrugsSearch(Request $request) {
 
-        $data = self::getDrugsByName($request);
+        $data = $this->getDrugsByName($request);
 
-        if (isset($data->error->code) == 'NOT_FOUND') {
-            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
-                ->withInput();
-        }
+        $this->ensureDrugDataIsValid($data);
 
         // if (count($data->results) === 1 && count($data->results[0]->products) === 1) {
         //     return view('drugs.show', ['drug' => $data->results[0]])
@@ -156,6 +146,15 @@ class DrugController extends Controller
         // dd($data->results);
 
         return view('drugs.search-results', ['drugs' => $data->results]);
+    }
+
+    protected function ensureDrugDataIsValid($dataResults) {
+        if (isset($data->error->code) === 'NOT_FOUND') {
+            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
+                ->withInput();
+        }
+
+        return;
     }
 }
 
