@@ -24,6 +24,11 @@ class DrugController extends Controller
         return view('drugs.index');
     }
 
+    //fallback page
+    public function trySearchingForMedication() {
+        return redirect('/')->with('message', "Oops! Something unexpected happened. Try searching for a medication here!");
+    }
+
 
     //gets api key from config file
     static function getOpenFdaApiKey() {
@@ -72,7 +77,6 @@ class DrugController extends Controller
 
         $json = Cache::remember($cacheKey, 3600, function () use ($query) {
 
-            //Return object
             return json_decode(Http::get($query)->getBody());
         });
 
@@ -85,7 +89,6 @@ class DrugController extends Controller
         //build api query here
 
         $query = $this->stitchDrugQuery($request, 'byName', 'drugsFDA');
-
 
         $data = $this->getAndCacheDrugs($query);
 
@@ -111,9 +114,7 @@ class DrugController extends Controller
 
         $data = $this->getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
 
-        if (isset($data->error->code) == 'NOT_FOUND') {
-            return redirect('/')->with('message', "Product not found! If this issue persists please contact the support department.");
-        }
+        $this->ensureDrugDataIsValid($data);
 
         $iteration = 0;
 
@@ -132,23 +133,36 @@ class DrugController extends Controller
 
     }
 
-
+    //show drugs search page and process search
     public function showDrugsSearch(Request $request) {
 
         $data = $this->getDrugsByName($request);
 
         $this->ensureDrugDataIsValid($data);
 
-        // if (count($data->results) === 1 && count($data->results[0]->products) === 1) {
-        //     return view('drugs.show', ['drug' => $data->results[0]])
-        // }
 
-        // dd($data->results);
+        if (ensureOnlyOneProductReturned($data)) {
+            return $this->skip_search_results_page_if_only_one_result($data);
+        }
+
 
         return view('drugs.search-results', ['drugs' => $data->results]);
     }
 
-    protected function ensureDrugDataIsValid($dataResults) {
+
+    public function skip_search_results_page_if_only_one_result($data) {
+        $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
+
+        return view('drugs.show', ['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
+    }
+
+
+
+
+    //utility functions below
+    //-----------------------------------------------------------------
+
+    private function ensureDrugDataIsValid($dataResults) {
         if (isset($data->error->code) === 'NOT_FOUND') {
             return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
                 ->withInput();
@@ -156,6 +170,16 @@ class DrugController extends Controller
 
         return;
     }
+
+
+    private function ensureOnlyOneProductReturned($dataResults) {
+        if(count($data->results) === 1 && count($data->results[0]->products) === 1) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
 
 
