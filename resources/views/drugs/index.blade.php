@@ -26,10 +26,6 @@
                                 <x-form-components.drug-class-select />
                             </div>
 
-                            <div class="mb-3">
-                                <label for="limitCount" class="form-label">Results Limit</label>
-                                <input type="number" id="limitCount" value="20" name="count" class="form-control">
-                            </div>
 
                             <div class="d-flex justify-content-end">
                                 <button class="btn btn-primary">Search!</button>

@@ -28,9 +28,21 @@
                 <li><a href="/" class="nav-link px-2 link-secondary">Home</a></li>
               </ul>
 
-              <div class="col-md-3 text-end">
-                <button type="button" class="btn btn-outline-primary me-2">Login</button>
-                <button type="button" class="btn btn-primary">Sign-up</button>
+{{--              <div class="col-md-3 text-end">--}}
+                <div class="col-3 d-flex justify-center-end align-items-center">
+                  <form method="POST" action="/drugs">
+                      @csrf
+{{--                <button type="button" class="btn btn-outline-primary me-2">Login</button>--}}
+{{--                <button type="button" class="btn btn-primary">Sign-up</button>--}}
+                      <div class="col-12 d-flex justify-content-end align-items-center">
+                  <label for="drugName" class="form-label"></label>
+                  <input type="text" id="drugName" name="drugName" class="form-control"
+                         placeholder="Search by Brand name...">
+                  <div class="d-flex justify-content-end">
+                      <button class="btn btn-primary">Search!</button>
+                  </div>
+                      </div>
+                  </form>
               </div>
             </header>
         </nav>

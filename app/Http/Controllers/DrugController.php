@@ -44,7 +44,7 @@ class DrugController extends Controller
         switch ($searchMethod) {
             //search by drug name
             case 'byName':
-                $query .= $discludeDiscontinued . 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
+                $query .= $discludeDiscontinued . 'products.brand_name:' . $request->drugName . '&limit=100' . '&sort=application_number:asc';
                 break;
             //search by application num and product num
             case 'byApplicationNumProductNum':
