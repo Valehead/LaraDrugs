@@ -24,4 +24,6 @@ Route::get('/drugs/{application_num}/{product_num}', [DrugController::class, 'sh
 
 Route::post('/drugs', [DrugController::class, 'showDrugsSearch']);
 
+Route::fallback([DrugController::class, 'trySearchingForMedication']);
+
 // Route::get('/drugs/search-results', [DrugController::class, 'showDrugSearchResults']);
