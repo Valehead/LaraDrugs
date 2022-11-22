@@ -1,4 +1,4 @@
-@props(['drug', 'druginfo', 'manufactureData'])
+@props(['drug', 'druginfo'])
 
 <div class="accordion accordion-flush border-top" id="accordionFlushExample">
     <div class="accordion-item">
@@ -53,11 +53,7 @@
             <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body">
                     <ul class="list-group list-group-flush">
-                    {{{dd($druginfo)}}}
 
-
-
-{{--                         @foreach ($eventsData->patient->reaction[0] as $reactions => $term)--}}
                             <li class="list-group-item overflow-auto" style="height:200px"><p>{{$druginfo->warnings[0]}}</p></li>
 
                             <li class="list-group-item"><p>{{$druginfo->when_using[0]}}</p></li>
@@ -65,9 +61,6 @@
                             <li class="list-group-item"><p>{{$druginfo->do_not_use[0]}}</p></li>
                             <li class="list-group-item"><p>{{$druginfo->pregnancy_or_breast_feeding[0]}}</p></li>
                             <li class="list-group-item"><p>{{$druginfo->questions[0]}}</p></li>
-
-
-
 
 
                     </ul>

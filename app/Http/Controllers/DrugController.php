@@ -60,20 +60,16 @@ class DrugController extends Controller
             case 'byAdverseEvents':
                 $query .= '&search=' . $request->drugName . '+AND+count=patient.reaction.reactionmeddrapt.exact' . '&limit=10';
                 break;
-
         }
 
-//         dd($query);
         return $query;
 
     }
 
 
     //execute the given query and store results to cache
-    public function getDrugs($query)
+    public function getAndCacheDrugs($query)
     {
-
-        // dd($query);
 
         //Create unique cache key by turning query url into md5 hash
         $cacheKey = 'drugs.' . md5($query);
@@ -96,7 +92,7 @@ class DrugController extends Controller
         $query = self::stitchDrugQuery($request, 'byName', 'drugsFDA');
 
 
-        $data = self::getDrugs($query);
+        $data = self::getAndCacheDrugs($query);
 
         return $data;
     }
@@ -109,7 +105,7 @@ class DrugController extends Controller
 
         $query = self::stitchDrugQuery($request, $searchMethod, $endPointKey);
 
-        $data = self::getDrugs($query);
+        $data = self::getAndCacheDrugs($query);
 
         return $data;
     }
@@ -134,12 +130,8 @@ class DrugController extends Controller
                 break;
             }
         }
+
         $labelingData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
-
-        $NDCData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byNDC', 'NDC');
-
-
-        $eventsData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byAdverseEvents', 'adverseEvents');
 
 
         return view('drugs.show',['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
@@ -151,11 +143,12 @@ class DrugController extends Controller
     {
 
         $data = self::getDrugsByName($request);
+
         if (isset($data->error->code) == 'NOT_FOUND') {
             return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
                 ->withInput();
-
         }
+
         return view('drugs.search-results', ['drugs' => $data->results]);
     }
 }

@@ -16,7 +16,7 @@
                     @endif
 
                 </div>
-{{--{{dd(druginfo)}}--}}
+
                 <x-drug-info-card-components.drug-info-accordion :drug="$drug" :druginfo="$druginfo"/>
 
             </x-card>
