@@ -1,7 +1,7 @@
 <x-layout>
 
     <div class="row">
-        <div class="offset-3 col-6">
+        <div class="offset-md-1 col-md-10 offset-3 col-6">
 
             <x-card>
                 <div class="card-body">
@@ -16,7 +16,7 @@
                     @endif
 
                 </div>
-
+{{--{{dd(druginfo)}}--}}
                 <x-drug-info-card-components.drug-info-accordion :drug="$drug" :druginfo="$druginfo"/>
 
             </x-card>

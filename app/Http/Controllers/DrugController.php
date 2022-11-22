@@ -42,23 +42,26 @@ class DrugController extends Controller
         $discludeDiscontinued =  '&search=products.marketing_status:(Prescription+OR+Over-the-counter)+AND+';
 
         switch ($searchMethod) {
+            //search by drug name
             case 'byName':
                 $query .= $discludeDiscontinued . 'products.brand_name:' . $request->drugName . '&limit=' . $request->count . '&sort=application_number:asc';
                 break;
-
+            //search by application num and product num
             case 'byApplicationNumProductNum':
                 $query .= $discludeDiscontinued . 'application_number:"' . $request->application_num . '"+AND+products.product_number:' . $request->product_num . '&limit=1' . '&sort=application_number:asc';
-                break;
-
-            case 'byAdverseEvents':
-                $query .= '&search=' . $request->adverse_events . 'patient.reaction.reactionmeddrapt:' . '&limit=1';
                 break;
             //search by indications and usage
             case 'byProductLabeling':
                 $query .=  '&search=' . $request->drugName . '+AND+count=indications_and_usage' . '&limit=1';
                 break;
-        }
+            case 'byNDC';
+                $query .= '&search=' . $request->drugName . '&limit=1';
+            //search by adverse events
+            case 'byAdverseEvents':
+                $query .= '&search=' . $request->drugName . '+AND+count=patient.reaction.reactionmeddrapt.exact' . '&limit=10';
+                break;
 
+        }
 
 //         dd($query);
         return $query;
@@ -94,8 +97,6 @@ class DrugController extends Controller
 
 
         $data = self::getDrugs($query);
-        //$data2 = self::getDrugs($query);
-
 
         return $data;
     }
@@ -107,10 +108,8 @@ class DrugController extends Controller
         //build api query here
 
         $query = self::stitchDrugQuery($request, $searchMethod, $endPointKey);
-         //dd($query);
 
         $data = self::getDrugs($query);
-
 
         return $data;
     }
@@ -135,11 +134,12 @@ class DrugController extends Controller
                 break;
             }
         }
-
-        //dd($data->results[0]->products[0]->brand_name);
-
         $labelingData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
+        $NDCData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byNDC', 'NDC');
+
+
+        $eventsData = self::getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byAdverseEvents', 'adverseEvents');
 
 
         return view('drugs.show',['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
@@ -151,12 +151,11 @@ class DrugController extends Controller
     {
 
         $data = self::getDrugsByName($request);
-
         if (isset($data->error->code) == 'NOT_FOUND') {
             return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
                 ->withInput();
-        }
 
+        }
         return view('drugs.search-results', ['drugs' => $data->results]);
     }
 }
