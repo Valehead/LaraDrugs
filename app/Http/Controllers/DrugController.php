@@ -141,7 +141,7 @@ class DrugController extends Controller
         $this->ensureDrugDataIsValid($data);
 
 
-        if (ensureOnlyOneProductReturned($data)) {
+        if ($this->ensureOnlyOneProductReturned($data)) {
             return $this->skip_search_results_page_if_only_one_result($data);
         }
 
