@@ -49,7 +49,7 @@ class DrugController extends Controller
                 $query .= $discludeDiscontinued . 'products.brand_name:' . $dataToSearch->drugName . '&limit=100' . '&sort=application_number:asc';
                 break;
             //search by application num and product num
-            case 'byApplicationNumProductNum':
+            case 'byApplicationNumAndProductNum':
                 $query .= $discludeDiscontinued . 'application_number:"' . $dataToSearch->application_num . '"+AND+products.product_number:' . $dataToSearch->product_num . '&limit=1' . '&sort=application_number:asc';
                 break;
             //search by indications and usage
@@ -99,7 +99,7 @@ class DrugController extends Controller
     //show drug results
     public function showSingleDrug(Request $request) {
 
-        $data = $this->getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
+        $data = $this->getIndividualDrugData($request, 'byApplicationNumAndProductNum', 'drugsFDA');
 
 
         if(! $this->ensureDrugDataIsValid($data)) {
@@ -111,7 +111,7 @@ class DrugController extends Controller
 
 
         $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
-
+        dd($labelingData);
 
         return view('drugs.show',['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
 
