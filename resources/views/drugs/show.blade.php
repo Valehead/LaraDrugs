@@ -1,7 +1,7 @@
 <x-layout>
 
     <div class="row">
-        <div class="offset-md-1 col-md-10 offset-3 col-6">
+        <div class="col-8">
 
             <x-card>
                 <div class="card-body">
@@ -22,8 +22,7 @@
             </x-card>
 
         </div>
-    </div>
-    <div class="m-3">
+    <div class="offset-1 col-3">
         <x-card>
             <div class="col">
                 <div class="col container-sm mt-3">Adverse Events Input
@@ -37,7 +36,7 @@
                         <label class="form-label" for="customRange">satisfaction scale:</label>
                     </div>
 
-                    <div class="range position-relative col w-10 m-2">
+                    <div class="range position-relative col w-10 m-2" data-toggle="tooltip" data-placement="top" title="">
                         <input type="range" class="form-range" min="0" max="10" id="customRange"/>
 
 
@@ -49,6 +48,7 @@
         </x-card>
 
     </div>
+</div>
 
 </x-layout>
 
