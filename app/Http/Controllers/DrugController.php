@@ -84,21 +84,8 @@ class DrugController extends Controller
 
     }
 
-    //get drug results by name
-    public function getDrugsByName(Request $request) {
-        //build api query here
-
-        $query = $this->stitchDrugQuery($request, 'byName', 'drugsFDA');
-
-        $data = $this->getAndCacheDrugs($query);
-
-        return $data;
-    }
-
-
     //get drug results by application number & product number
     public function getIndividualDrugData($request, $searchMethod, $endPointKey) {
-        //build api query here
 
         $query = $this->stitchDrugQuery($request, $searchMethod, $endPointKey);
 
@@ -133,7 +120,7 @@ class DrugController extends Controller
     //show drugs search page and process search
     public function showDrugsSearch(Request $request) {
 
-        $data = $this->getDrugsByName($request);
+        $data = $this->getIndividualDrugData($request, 'byName', 'drugsFDA');
 
 
         if(! $this->ensureDrugDataIsValid($data)) {
@@ -147,13 +134,17 @@ class DrugController extends Controller
 
 
         return view('drugs.search-results', ['drugs' => $data->results]);
+
     }
 
 
+    //method to help get drug label info when search only returns 1 result
     public function skip_search_results_page_if_only_one_result($data) {
+
         $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
         return view('drugs.show', ['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
+
     }
 
 
@@ -191,15 +182,15 @@ class DrugController extends Controller
 
     private function ensure_returned_data_is_the_correct_product(&$dataResults, $productNumber) {
 
-        foreach($dataResults->results[0]->products as $product){
+        $result = array_values(array_filter($dataResults->results[0]->products, function ($product) use ($productNumber) {
+            return $product->product_number === $productNumber;
+        }));
 
-            if($product->product_number == $productNumber){
-                unset($dataResults->results[0]->products);
-                $dataResults->results[0]->products[] = $product;
-                return;
-            }
+        unset($dataResults->results[0]->products);
 
-        }
+        $dataResults->results[0]->products = $result;
+
+        return;
 
     }
 
