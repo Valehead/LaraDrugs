@@ -24,4 +24,17 @@
         </div>
     </div>
 
+    <x-card>
+    <div class="container-md m-3">100% wide until medium breakpoint
+        <div class="input-group">
+            <span class="input-group-text">With textarea</span>
+            <textarea class="form-control" aria-label="With textarea"></textarea>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary">Primary</button>
+    </div>
+    </x-card>
+
 </x-layout>
+
+
