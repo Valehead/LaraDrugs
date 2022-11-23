@@ -97,7 +97,7 @@ class DrugController extends Controller
 
 
     //show drug results
-    public function showDrug(Request $request) {
+    public function showSingleDrug(Request $request) {
 
         $data = $this->getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
 
