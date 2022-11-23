@@ -23,17 +23,32 @@
 
         </div>
     </div>
+    <div class="m-3">
+        <x-card>
+            <div class="col">
+                <div class="col container-sm mt-3">Adverse Events Input
+                    <div class="input-group">
+                        <span class="input-group-text">comment (optional)</span>
+                        <textarea class="form-control" aria-label="Comments"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group m-3 p-3">
+                        <label class="form-label" for="customRange">satisfaction scale:</label>
+                    </div>
 
-    <x-card>
-    <div class="container-md m-3">100% wide until medium breakpoint
-        <div class="input-group">
-            <span class="input-group-text">With textarea</span>
-            <textarea class="form-control" aria-label="With textarea"></textarea>
-        </div>
+                    <div class="range position-relative col w-10 m-2">
+                        <input type="range" class="form-range" min="0" max="10" id="customRange"/>
 
-        <button type="button" class="btn btn-outline-primary">Primary</button>
+
+                        <button type="button" class="btn btn-outline-primary">Primary</button>
+
+                    </div>
+                </div>
+            </div>
+        </x-card>
+
     </div>
-    </x-card>
 
 </x-layout>
 
