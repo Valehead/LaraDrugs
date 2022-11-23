@@ -114,17 +114,14 @@ class DrugController extends Controller
 
         $data = $this->getIndividualDrugData($request, 'byApplicationNumProductNum', 'drugsFDA');
 
-        $this->ensureDrugDataIsValid($data);
 
-        $iteration = 0;
+        if(! $this->ensureDrugDataIsValid($data)) {
+            return $this->returnNoMatchesFound();
+        };
 
-        foreach($data->results[0]->products as $product){
-            if($product->product_number === $request->product_num){
-                unset($data->results[0]->products);
-                $data->results[0]->products[] = $product;
-                break;
-            }
-        }
+
+        $this->ensure_returned_data_is_the_correct_product($data, $request->product_num);
+
 
         $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
@@ -138,7 +135,10 @@ class DrugController extends Controller
 
         $data = $this->getDrugsByName($request);
 
-        $this->ensureDrugDataIsValid($data);
+
+        if(! $this->ensureDrugDataIsValid($data)) {
+            return $this->returnNoMatchesFound();
+        };
 
 
         if ($this->ensureOnlyOneProductReturned($data)) {
@@ -163,21 +163,44 @@ class DrugController extends Controller
     //-----------------------------------------------------------------
 
     private function ensureDrugDataIsValid($dataResults) {
-        if (isset($data->error->code) === 'NOT_FOUND') {
-            return redirect('/')->with('message', "No matches found! Please check your spelling and try again.")
-                ->withInput();
+
+        if (isset($dataResults->error->code)){
+            return false;
         }
 
-        return;
+        return true;
+
+    }
+
+
+    private function returnNoMatchesFound(){
+        return redirect('/')->with('message', "No Medications found! Please check your spelling and try again.")
+        ->withInput();
     }
 
 
     private function ensureOnlyOneProductReturned($dataResults) {
-        if(count($data->results) === 1 && count($data->results[0]->products) === 1) {
+
+        if(count($dataResults->results) === 1 && count($dataResults->results[0]->products) === 1) {
             return true;
         }
 
         return false;
+
+    }
+
+    private function ensure_returned_data_is_the_correct_product(&$dataResults, $productNumber) {
+
+        foreach($dataResults->results[0]->products as $product){
+
+            if($product->product_number == $productNumber){
+                unset($dataResults->results[0]->products);
+                $dataResults->results[0]->products[] = $product;
+                return;
+            }
+
+        }
+
     }
 
 }
