@@ -1,16 +1,43 @@
 <?php
+/**
+ * Copyright © Nextvisit Inc. All rights reserved.
+ */
+
 
 namespace App\Http\Controllers;
 
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Nextvisit Drug Controller
+ *
+ * Interfaces with the openFDA API to provide up-to-date medication data through user searches.
+ *
+ * @version 1.0.0
+ * @author Nick Vales & Maxx Grass
+ */
 class DrugController extends Controller
 {
-    static $api_url = "https://api.fda.gov/drug/";
+    /**
+     * Used to supply first segment of base API URL.
+     * @var string <p>First segment of base api url to access Drug API.</p>
+     */
+    static string $api_url = "https://api.fda.gov/drug/";
 
-    static $endPoint = [
+
+    /**
+     * Used to supply the different endPoint URL segments to the stitchDrugQuery method based on value supplied by methods accessing it.
+     * @var string[] <p>Array of endPoint strings for URL construction.</p>
+     */
+    static array $endPoint = [
         'adverseEvents' => 'event.json?',
         'productLabeling' => 'label.json?',
         'NDC' => 'ndc.json?',
@@ -19,38 +46,56 @@ class DrugController extends Controller
     ];
 
 
-    //index page
+    /**
+     * Returns Index view for main project page.
+     * @return Application|Factory|View
+     */
     public function index() {
         return view('drugs.index');
     }
 
-    //fallback page
+
+    /**
+     * Default fallback method for when a route/view is not defined.
+     * @return Application|RedirectResponse|Redirector
+     */
     public function trySearchingForMedication() {
         return redirect('/')->with('message', "Oops! Something unexpected happened. Try searching for a medication here!");
     }
 
 
-    //gets api key from config file
+
+    /**
+     * Returns the openFdaApiKey from the project's .env file.
+     * @return Repository|Application|mixed
+     */
     static function getOpenFdaApiKey() {
         return config('values.openFdaApiKey');
     }
 
 
-    //query builder
-    public function stitchDrugQuery($dataToSearch, string $searchMethod, string $endPointKey) {
+
+    /**
+     * Returns the API call string after it has been stitched together from input variables and static class variables.
+     * @param object $dataToSearch <p>Object containing Drug FDA info needed to add to the query.</p>
+     * @param string $searchMethod <p>Search method to be performed.</p>
+     * @param string $endPointKey <p>Key to access static $endPoint array.</p>
+     * @return string
+     */
+    public function stitchDrugQuery(object $dataToSearch, string $searchMethod, string $endPointKey) {
 
         //marketing_status attempts to exclude
         $query = self::$api_url . self::$endPoint[$endPointKey] . "api_key=" . $this->getOpenFdaApiKey();
-        $discludeDiscontinued =  '&search=products.marketing_status:(Prescription+OR+Over-the-counter)+AND+';
+        $filterDiscontinuedDrugs =  '&search=products.marketing_status:(Prescription+OR+Over-the-counter)+AND+';
 
         switch ($searchMethod) {
             //search by drug name
             case 'byName':
-                $query .= $discludeDiscontinued . 'products.brand_name:' . $dataToSearch->drugName . '&limit=100' . '&sort=application_number:asc';
+                $query .= $filterDiscontinuedDrugs . 'products.brand_name:' . $dataToSearch->drugName . '&limit=100' . '&sort=application_number:asc';
                 break;
             //search by application num and product num
             case 'byApplicationNumAndProductNum':
-                $query .= $discludeDiscontinued . 'application_number:"' . $dataToSearch->application_num . '"+AND+products.product_number:' . $dataToSearch->product_num . '&limit=1' . '&sort=application_number:asc';
+                $query .= $filterDiscontinuedDrugs . 'application_number:"' . $dataToSearch->application_num . '"+AND+products.product_number:' . $dataToSearch->product_num . '&limit=1' . '&sort=application_number:asc';
                 break;
             //search by indications and usage
             case 'byProductLabeling':
@@ -58,6 +103,7 @@ class DrugController extends Controller
                 break;
             case 'byNDC';
                 $query .= '&search=' . $dataToSearch->drugName . '&limit=1';
+                break;
             //search by adverse events
             case 'byAdverseEvents':
                 $query .= '&search=' . $dataToSearch->drugName . '+AND+count=patient.reaction.reactionmeddrapt.exact' . '&limit=10';
@@ -69,34 +115,48 @@ class DrugController extends Controller
     }
 
 
-    //execute the given query and store results to cache
-    public function getAndCacheDrugs($query) {
+
+
+    /**
+     * Returns and caches results for API call result.
+     * @param string $query <p>API Query String returned from the stitchDrugQuery method.</p>
+     * @return object <p>Result from the API call</p>
+     */
+    public function getAndCacheDrugs(string $query) {
 
         //Create unique cache key by turning query url into md5 hash
         $cacheKey = 'drugs.' . md5($query);
 
-        $json = Cache::remember($cacheKey, 3600, function () use ($query) {
-
-            return json_decode(Http::get($query)->getBody());
-        });
-
-        return $json;
+        return $this->getResultsFromApiAndCache($cacheKey, $query);
 
     }
 
-    //get drug results by application number & product number
-    public function getIndividualDrugData($request, $searchMethod, $endPointKey) {
+
+
+
+    /**
+     * Returns an Object of data returned by the API call for a single Medication.
+     * @param $request <p>Incoming Request object containing the application number and corresponding product number for what needs to be searched for.</p>
+     * @param string $searchMethod <p>Search method to be performed.</p>
+     * @param string $endPointKey <p>Key to access static $endPoint array.</p>
+     * @return object <p>API call result.</p>
+     */
+    public function getIndividualDrugData(object $request, string $searchMethod, string $endPointKey) {
 
         $query = $this->stitchDrugQuery($request, $searchMethod, $endPointKey);
 
-        $data = $this->getAndCacheDrugs($query);
+        return $this->getAndCacheDrugs($query);
 
-        return $data;
     }
 
 
 
-    //show drug results
+
+    /**
+     * Returns the view page for a single Medication. Also returns the data objects containing product details.
+     * @param Request $request <p>Request object being supplied by the router.</p>
+     * @return Application|Factory|View|RedirectResponse|Redirector <p>Single Medication View and API results objects</p>
+     */
     public function showSingleDrug(Request $request) {
 
         $data = $this->getIndividualDrugData($request, 'byApplicationNumAndProductNum', 'drugsFDA');
@@ -104,20 +164,27 @@ class DrugController extends Controller
 
         if(! $this->ensureDrugDataIsValid($data)) {
             return $this->returnNoMatchesFound();
-        };
+        }
 
 
         $this->ensure_returned_data_is_the_correct_product($data, $request->product_num);
 
-
         $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
-        dd($labelingData);
+
 
         return view('drugs.show',['drug' => $data->results[0], 'druginfo' => $labelingData->results[0]]);
 
     }
 
-    //show drugs search page and process search
+
+
+
+
+    /**
+     * Returns Medication Search Results View and Drugs data returned from the API
+     * @param Request $request <p>Request object being supplied by the router.</p>
+     * @return Application|Factory|View|RedirectResponse|Redirector <p>Search Results View and API results object</p>
+     */
     public function showDrugsSearch(Request $request) {
 
         $data = $this->getIndividualDrugData($request, 'byName', 'drugsFDA');
@@ -125,7 +192,7 @@ class DrugController extends Controller
 
         if(! $this->ensureDrugDataIsValid($data)) {
             return $this->returnNoMatchesFound();
-        };
+        }
 
 
         if ($this->ensureOnlyOneProductReturned($data)) {
@@ -138,8 +205,14 @@ class DrugController extends Controller
     }
 
 
-    //method to help get drug label info when search only returns 1 result
-    public function skip_search_results_page_if_only_one_result($data) {
+
+
+    /**
+     * Returns single Medication View if an initial search only returns one medication result.
+     * @param object $data <p>Object containing initial Drug data returned from the drugsFDA endpoint. It will be used to GET label data, then it will also be returned to the view.</p>
+     * @return Application|Factory|View <p>Single Medication View and API results objects.</p>
+     */
+    public function skip_search_results_page_if_only_one_result(object $data) {
 
         $labelingData = $this->getIndividualDrugData((object) ['drugName' => $data->results[0]->products[0]->brand_name], 'byProductLabeling', 'productLabeling');
 
@@ -149,11 +222,12 @@ class DrugController extends Controller
 
 
 
-
-    //utility functions below
-    //-----------------------------------------------------------------
-
-    private function ensureDrugDataIsValid($dataResults) {
+    /**
+     * Returns a bool based on if the API returned valid data or not.
+     * @param object $dataResults <p>API results</p>
+     * @return bool
+     */
+    private function ensureDrugDataIsValid(object $dataResults) {
 
         if (isset($dataResults->error->code)){
             return false;
@@ -164,13 +238,26 @@ class DrugController extends Controller
     }
 
 
+
+    /**
+     * Returns a redirect to the Index view if the initial API search doesn't return any medications.
+     * @return Application|RedirectResponse|Redirector <p>Redirect with prior form input as well as a message telling the user what happened.</p>
+     */
     private function returnNoMatchesFound(){
+
         return redirect('/')->with('message', "No Medications found! Please check your spelling and try again.")
         ->withInput();
+
     }
 
 
-    private function ensureOnlyOneProductReturned($dataResults) {
+
+    /**
+     * Returns a bool based on if only 1 product was returned by the search API call.
+     * @param object $dataResults <p>Medication results data</p>
+     * @return bool
+     */
+    private function ensureOnlyOneProductReturned(object $dataResults) {
 
         if(count($dataResults->results) === 1 && count($dataResults->results[0]->products) === 1) {
             return true;
@@ -180,7 +267,15 @@ class DrugController extends Controller
 
     }
 
-    private function ensure_returned_data_is_the_correct_product(&$dataResults, $productNumber) {
+
+
+    /**
+     * Modifies the $dataResults object by reference to ensure the product we're attempting to serve IS the product the user chose to view.
+     * @param object &$dataResults <p>Parameter to be modified to only include the single requested product.</p>
+     * @param $productNumber <p>Product number specified by the Request url.</p>
+     * @return void
+     */
+    private function ensure_returned_data_is_the_correct_product(object $dataResults, $productNumber): void{
 
         $result = array_values(array_filter($dataResults->results[0]->products, function ($product) use ($productNumber) {
             return $product->product_number === $productNumber;
@@ -190,12 +285,22 @@ class DrugController extends Controller
 
         $dataResults->results[0]->products = $result;
 
-        return;
+    }
 
+
+
+    /**
+     * Fetches, caches, and returns the API Result using the Query string supplied.
+     * @param string $cacheKey <p>md5 Hashed query string for storing results in cache.</p>
+     * @param string $query <p>Query String for API call.</p>
+     * @return object <p>API Result decoded from Json.</p>
+     */
+    private function getResultsFromApiAndCache(string $cacheKey, string $query): object{
+
+        return Cache::remember($cacheKey, 3600, function () use ($query) {
+            return json_decode(Http::get($query)->getBody());
+
+        });
     }
 
 }
-
-
-
-
