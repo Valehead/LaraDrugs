@@ -22,33 +22,8 @@
             </x-card>
 
         </div>
-    <div class="offset-1 col-3">
-        <x-card>
-            <div class="col">
-                <div class="col container-sm mt-3">Adverse Events Input
-                    <div class="input-group">
-                        <span class="input-group-text">comment (optional)</span>
-                        <textarea class="form-control" aria-label="Comments"></textarea>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group m-3 p-3">
-                        <label class="form-label" for="customRange">satisfaction scale:</label>
-                    </div>
-
-                    <div class="range position-relative col w-10 m-2" data-toggle="tooltip" data-placement="top" title="">
-                        <input type="range" class="form-range" min="0" max="10" id="customRange"/>
-
-
-                        <button type="button" class="btn btn-outline-primary">Primary</button>
-
-                    </div>
-                </div>
-            </div>
-        </x-card>
-
+        <x-search-result-table-components.review-section></x-search-result-table-components.review-section>
     </div>
-</div>
 
 </x-layout>
 
