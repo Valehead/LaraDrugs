@@ -270,8 +270,8 @@ class DrugController extends Controller
 
 
     /**
-     * Modifies the $dataResults object by reference to ensure the product we're attempting to serve IS the product the user chose to view.
-     * @param object &$dataResults <p>Parameter to be modified to only include the single requested product.</p>
+     * Modifies the $dataResults object to ensure the product we're attempting to serve IS the product the user chose to view.
+     * @param object $dataResults <p>Parameter to be modified to only include the single requested product.</p>
      * @param $productNumber <p>Product number specified by the Request url.</p>
      * @return void
      */
